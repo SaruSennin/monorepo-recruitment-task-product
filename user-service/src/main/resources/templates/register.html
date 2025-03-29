@@ -124,42 +124,47 @@
 </div>
 
 <script>
-    const submitButton = document.getElementById("submit");
-    const errorMessage = document.getElementById("error-message");
+    document.addEventListener('DOMContentLoaded', function () {
+        const registerForm = document.getElementById('registerForm');
+        const errorMessage = document.getElementById('error-message');
 
-    submitButton.addEventListener('click', (e) => {
-        e.preventDefault();
+        registerForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
 
-        if (password !== confirmPassword) {
-            errorMessage.textContent = "Hasła muszą być takie same!";
-        } else {
-            const data = {
-                username,
-                password
-            };
+            if (!username || !password || !confirmPassword) {
+                errorMessage.textContent = 'Wszystkie pola są wymagane.';
+                return;
+            }
 
-            const jsonData = JSON.stringify(data);
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Hasła muszą być identyczne.';
+                return;
+            }
 
-            fetch('/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: jsonData
-            })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Rejestracja powiodła się!');
-                    } else {
-                        console.error('Błąd rejestracji');
-                    }
-                })
-                .catch(error => {
-                    console.error('Błąd:', error);
+            const data = {username, password};
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
                 });
-        }
+
+                if (response.ok) {
+                    window.location.href = 'http://localhost:8082/login';
+                } else {
+                    const errorData = await response.json();
+                    errorMessage.textContent = errorData.message || 'Rejestracja nie powiodła się. Spróbuj ponownie.';
+                }
+            } catch (error) {
+                console.error('Wystąpił błąd:', error);
+                errorMessage.textContent = 'Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.';
+            }
+        });
     });
 </script>
 
