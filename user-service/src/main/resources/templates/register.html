@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularz logowania</title>
+    <style>
+        /* Resetowanie marginesów i wypełnień */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Tło strony */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Styl kontenera formularza */
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            position: relative; /* Usunięcie absolutnego pozycjonowania linku */
+        }
+
+        /* Nagłówek formularza */
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Styl grupy formularza */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        /* Styl etykiet */
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        /* Styl pól wejściowych */
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Styl przycisku */
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Styl linku do logowania */
+        .login-link {
+            font-size: 14px;
+            color: #4CAF50;
+            text-decoration: none;
+            display: block; /* Umożliwia stosowanie marginów */
+            text-align: center; /* Wyśrodkowanie linku */
+            margin-bottom: 20px; /* Odstęp od formularza */
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Styl komunikatu o błędzie */
+        .error-message {
+            color: red;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <a href="http://localhost:8082/login" class="login-link">Zaloguj się</a>
+
+    <form id="registerForm" action="#" method="POST">
+        <h2>Rejestracja</h2>
+        <div class="form-group">
+            <label for="username">Nazwa użytkownika:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Hasło:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="confirmPassword">Powtórz hasło:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <button id="submit" type="submit">Zarejestruj się</button>
+        <div id="error-message" class="error-message"></div> <!-- Miejsce na komunikat o błędzie -->
+    </form>
+</div>
+
+<script>
+    const submitButton = document.getElementById("submit");
+    const errorMessage = document.getElementById("error-message");
+
+    submitButton.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            errorMessage.textContent = "Hasła muszą być takie same!";
+        } else {
+            const data = {
+                username,
+                password
+            };
+
+            const jsonData = JSON.stringify(data);
+
+            fetch('/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: jsonData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Rejestracja powiodła się!');
+                    } else {
+                        console.error('Błąd rejestracji');
+                    }
+                })
+                .catch(error => {
+                    console.error('Błąd:', error);
+                });
+        }
+    });
+</script>
+
+</body>
+</html>

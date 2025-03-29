@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Produktów</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        .logout-link {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 16px;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: auto;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        form {
+            display: inline-block;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        input, select {
+            padding: 5px;
+            width: 200px;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group button {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+<a href="http://localhost:8082/logout" class="logout-link">Wyloguj się</a>
+<h1>Lista Produktów</h1>
+
+<h2>Dodaj / Edytuj Produkt</h2>
+<form id="productForm" onsubmit="saveProduct(event)">
+    <input type="hidden" id="productId">
+
+    <div class="form-group">
+        <label for="productName">Nazwa:</label>
+        <input type="text" id="productName">
+    </div>
+
+    <div class="form-group">
+        <label for="productDescription">Opis:</label>
+        <input type="text" id="productDescription">
+    </div>
+
+    <div class="form-group">
+        <label for="productPrice">Cena:</label>
+        <input type="number" id="productPrice" step="0.01">
+    </div>
+
+    <div class="form-group">
+        <label for="productCategory">Kategoria:</label>
+        <select id="productCategory">
+            <option value=""></option>
+            <option value="ELECTRONICS">Elektronika</option>
+            <option value="CLOTHING">Ubrania</option>
+            <option value="FOOD">Jedzenie</option>
+            <option value="OTHER">Inne</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" id="saveButton">Zapisz</button>
+        <button type="button" id="editButton" style="display: none;">Edytuj</button>
+    </div>
+</form>
+
+<h2>Filtruj Produkty</h2>
+<div class="form-group">
+    <label for="filterCategory">Wybierz kategorię:</label>
+    <select id="filterCategory" onchange="filterProducts()">
+        <option value="">Wszystkie</option>
+        <option value="ELECTRONICS">Elektronika</option>
+        <option value="CLOTHING">Ubrania</option>
+        <option value="FOOD">Jedzenie</option>
+        <option value="OTHER">Inne</option>
+    </select>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Nazwa</th>
+        <th>Opis</th>
+        <th>Cena</th>
+        <th>Kategoria</th>
+        <th>Akcje</th>
+    </tr>
+    </thead>
+    <tbody id="productTable">
+    </tbody>
+</table>
+<script>
+    async function fetchProducts(category = '') {
+        let url = category === '' ? '/products/all' : `/products?category=${category}`;
+        const response = await fetch(url);
+        const products = await response.json();
+        const tableBody = document.getElementById('productTable');
+        tableBody.innerHTML = '';
+        products.forEach(product => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${product.name}</td>
+                    <td>${product.description}</td>
+                    <td>${product.price}</td>
+                    <td>${translateCategoryToPolish(product.category)}</td>
+                    <td>
+                        <button onclick="copyToEditForm('${product.id}', '${product.name}', '${product.description}', ${product.price}, '${product.category}')">Kopiuj do edycji</button>
+                        <button onclick="deleteProduct('${product.id}')">Usuń</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    async function saveProduct(event) {
+        event.preventDefault();
+        const id = document.getElementById('productId').value;
+        const name = document.getElementById('productName').value;
+        const description = document.getElementById('productDescription').value;
+        const price = document.getElementById('productPrice').value;
+        const category = document.getElementById('productCategory').value;
+
+        const url = id ? `/products/${id}` : '/products';
+        const method = id ? 'PUT' : 'POST';
+
+        await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description, price, category })
+        });
+
+        fetchProducts();
+        document.getElementById('productForm').reset();
+        document.getElementById('productId').value = '';
+        document.getElementById('saveButton').style.display = 'inline-block';
+        document.getElementById('editButton').style.display = 'none';
+    }
+
+    async function deleteProduct(id) {
+        await fetch(`/products/${id}`, { method: 'DELETE' });
+        fetchProducts();
+    }
+
+    function copyToEditForm(id, name, description, price, category) {
+        document.getElementById('productId').value = id;
+        document.getElementById('productName').value = name;
+        document.getElementById('productDescription').value = description;
+        document.getElementById('productPrice').value = price;
+        document.getElementById('productCategory').value = category;
+
+        document.getElementById('saveButton').style.display = 'none';
+        document.getElementById('editButton').style.display = 'inline-block';
+
+        document.getElementById('editButton').onclick = editProductDetails;
+    }
+
+    function editProductDetails() {
+        const event = new Event('submit');
+        saveProduct(event);
+    }
+
+    function translateCategoryToPolish(category) {
+        return { "ELECTRONICS": "Elektronika", "CLOTHING": "Ubrania", "FOOD": "Jedzenie", "OTHER": "Inne" }[category] || category;
+    }
+
+    function filterProducts() {
+        const selectedCategory = document.getElementById('filterCategory').value;
+        fetchProducts(selectedCategory);
+    }
+
+    fetchProducts();
+</script>
+</body>
+</html>

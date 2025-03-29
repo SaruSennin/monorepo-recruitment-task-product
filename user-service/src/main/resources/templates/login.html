@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularz logowania</title>
+    <style>
+        /* Resetowanie marginesów i wypełnień */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Tło strony */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Styl kontenera formularza */
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            position: relative; /* Aby link był w odpowiedniej pozycji */
+        }
+
+        /* Nagłówek formularza */
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Styl grupy formularza */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        /* Styl etykiet */
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        /* Styl pól wejściowych */
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Styl przycisku */
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Styl linku do strony rejestracji */
+        .register-link {
+            font-size: 14px;
+            color: #4CAF50;
+            text-decoration: none;
+            display: block;
+            text-align: center; /* Wyśrodkowanie linku */
+            margin-top: 10px; /* Odstęp od formularza */
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <a href="http://localhost:8082/register" class="register-link">Zarejestruj się</a>
+
+    <form action="#" method="POST">
+        <h2>Logowanie</h2>
+        <div class="form-group">
+            <label for="username">Nazwa użytkownika:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Hasło:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Zaloguj się</button>
+    </form>
+</div>
+
+</body>
+</html>
